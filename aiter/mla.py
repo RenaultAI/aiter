@@ -102,7 +102,7 @@ def get_meta_param(num_kv_splits, bs, total_kv, nhead, max_seqlen_q):
         num_kv_splits = sorted(tmp, key=lambda x: x[0], reverse=True)[0][1]
         # num_kv_splits = min(16, max(1, cu_num // bs))
 
-    get_mgc = {16: 16, 128: 16}
+    get_mgc = {4: 16, 16: 16, 128: 16}
 
     assert nhead in get_mgc, f"{nhead=} not supported"
     mgc = get_mgc[nhead]
@@ -145,7 +145,7 @@ def mla_decode_fwd(
             dtype=dtypes.fp32,
             device=device,
         )
-    elif nhead in [16, 128]:
+    elif nhead in [4, 16, 128]:
         logits = (
             o.view((total_s, num_kv_splits, nhead, v_head_dim))
             if num_kv_splits == 1

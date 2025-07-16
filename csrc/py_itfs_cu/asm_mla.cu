@@ -143,6 +143,16 @@ void mla_decode_stage1_asm_fwd(
                 impl_ptr = &impl_a16w16_bf16;
             }
         }
+        else if(gqa_ratio == 4)
+        {
+            // For gqa_ratio == 4, we'll use the same kernel as gqa_ratio == 16 with max_seqlen_q > 4
+            // This is a reasonable starting point and can be optimized further if needed
+            sub_Q = 128;
+            static AiterAsmKernel impl_a16w16_bf16(
+                "_ZN5aiter39mla_a16w16_qh16_m32x4_n16x1_coex0_mask1E",
+                "/mla/mla_a16w16_qh16_m32x4_n16x1_coex0_mask1.co");
+            impl_ptr = &impl_a16w16_bf16;
+        }
     }
 
     TORCH_CHECK(impl_ptr != nullptr, __func__, ": unsupport current Q_type:", Q.scalar_type());
